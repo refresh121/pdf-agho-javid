@@ -1,0 +1,241 @@
+♘:
+<!doctype html>
+
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>تبدیل عکس‌ها به PDF یک‌صفحه‌ای — ابزار آقای جاوید رضا</title>  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap" rel="stylesheet">  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>  <style>
+    :root{
+      --bg1:#0f0c29; --bg2:#302b63; --accent:#ff4d88;
+      --glass: rgba(255,255,255,0.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:'Vazirmatn',system-ui,Arial; background: linear-gradient(180deg,var(--bg1),var(--bg2)); color:#fff}
+
+    /* full-screen canvas for particles */
+    #tsparticles{position:fixed; inset:0; z-index:0}
+
+    .wrap{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px}
+    .card{width:100%;max-width:1100px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border-radius:18px;padding:28px;box-shadow:0 10px 40px rgba(0,0,0,0.6);backdrop-filter: blur(6px)}
+
+    h1{margin:0 0 14px;font-size:28px;letter-spacing:1px}
+    .controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+    input[type=file]{display:block}
+
+    .panel{display:flex;gap:12px;align-items:center}
+    .btn{cursor:pointer;padding:10px 16px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),#ffc857);color:#111;font-weight:700}
+
+    .preview{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap;max-height:300px;overflow:auto;padding:8px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))}
+    .preview img{height:120px;object-fit:cover;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,0.5)}
+
+    .big-note{margin-top:22px;padding:20px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));text-align:center}
+
+    /* افکت درخشان و بزرگ متن پایین */
+    .glow-text{font-size:36px;font-weight:900;margin-top:30px;padding:18px;border-radius:14px;display:inline-block}
+
+    /* SVG filter برای نرمی نور */
+    .glow-effect{filter:url(#neon)}
+
+    footer{margin-top:18px;text-align:center;color:rgba(255,255,255,0.6);font-size:13px}
+
+    .small-input{padding:8px;border-radius:10px;border:0;min-width:200px}
+
+    /* responsive */
+    @media(max-width:640px){.card{padding:16px}.glow-text{font-size:22px}}
+  </style></head>
+<body>
+  <div id="tsparticles"></div>  <div class="wrap">
+    <div class="card">
+      <h1>تبدیل مجموعه عکس‌ها به یک PDF یک‌صفحه‌ای — آماده برای دانلود</h1><div class="controls">
+    <div class="panel">
+      <label class="btn" id="chooseBtn">انتخاب عکس‌ها</label>
+      <input id="files" type="file" accept="image/*" multiple style="display:none">
+    </div>
+
+    <div class="panel">
+      <input id="filename" class="small-input" placeholder="اسم فایل خروجی (بدون .pdf) — مثال: final" />
+      <select id="format" class="small-input">
+        <option value="auto">کیفیت: حداکثر (PNG/JPEG خودکار)</option>
+        <option value="jpeg">JPEG (کمترین حجم)</option>
+        <option value="png">PNG (بدون فشرده‌سازی)</option>
+      </select>
+      <button class="btn" id="create">ایجاد PDF</button>
+    </div>
+  </div>
+
+  <div class="preview" id="preview"></div>
+
+  <div class="big-note">
+    <strong>نکتهٔ فنی (واقعی):</strong>
+    <div style="margin-top:8px;color:rgba(255,255,255,0.8)"> اگه عکس ها خیلی طولانی باشن مرورگر کرش میکنه اگه اندازه دودول دانیال باشه مشگلی پیش نمیاد.</div>
+  </div>
+
+  <div style="text-align:center;margin-top:26px">
+
+<svg width="0" height="0">
+      <defs>
+        <filter id="neon" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="6" result=
+"coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+  </svg>
+
+    <div id="bigText" class="glow-text glow-effect" style="background:linear-gradient(90deg,#ff4d88,#7b2ff7);-webkit-background-clip:text;background-clip:text;color:transparent;">
+      در درست کردن این سایت کون بنده پاره شد — پس از شما تقاضا میشود برای هر بار استفاده از آقا جاوید رضا تشکر کنید 🩷
+    </div>
+  </div>
+
+  <footer>نسخهٔ کلاینت — همه چیز در مرورگر شما انجام می‌شود. (بدون ارسال به سرور خیلی خفنم نه؟😎)</footer>
+</div>
+
+  </div>  <script>
+    // --- particles background (tsParticles) ---
+    tsParticles.load("tsparticles", {
+      fpsLimit: 60,
+      interactivity: { events: { onHover: { enable: true, mode: "repulse" }, onClick: { enable: true, mode: "push" } }, modes: { repulse: { distance: 120 } } },
+      particles: {
+        number: { value: 60 },
+        size: { value: { min: 1, max: 4 } },
+        move: { enable: true, speed: 0.9 },
+        links: { enable: true, distance: 150, opacity: 0.05 },
+        color: { value: ["#ff4d88","#7b2ff7","#ffd166"] }
+      },
+      detectRetina: true
+    });
+
+    // --- UI and file handling ---
+    const choose = document.getElementById('chooseBtn');
+    const input = document.getElementById('files');
+    const preview = document.getElementById('preview');
+    const createBtn = document.getElementById('create');
+    const filenameInput = document.getElementById('filename');
+    const formatSelect = document.getElementById('format');
+
+    choose.addEventListener('click', ()=> input.click());
+
+    let filesList = [];
+
+    input.addEventListener('change', async (e)=>{
+      filesList = Array.from(e.target.files).filter(f=>f.type.startsWith('image/'));
+      preview.innerHTML = '';
+      for(const f of filesList){
+        const url = URL.createObjectURL(f);
+        const img = document.createElement('img'); img.src = url; img.title = f.name;
+        preview.appendChild(img);
+      }
+    });
+
+    // --- helper: load image to HTMLImageElement and wait ---
+    function loadImageFromFile(file){
+      return new Promise((res,rej)=>{
+        const img = new Image();
+        img.onload = ()=> res(img);
+        img.onerror = (e)=> rej(e);
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    // --- Main: create single-page PDF using pdf-lib ---
+    createBtn.addEventListener('click', async ()=>{
+      if(!filesList.length){ alert('متاسفانه شما کصخل هستید چون عکسی انتخاب نکردید . .'); return; }
+
+      createBtn.disabled = true; createBtn.textContent = 'در حال ساخت...';
+
+      try{
+        // load all images and get natural sizes
+        const imgs = [];
+        for(const f of filesList){
+          const img = await loadImageFromFile(f);
+          imgs.push({file:f, img});
+        }
+
+        // compute width = max image width, height = sum of heights
+        const widths = imgs.map(it=>it.img.naturalWidth);
+        const heights = imgs.map(it=>it.img.naturalHeight);
+        const maxW = Math.max(...widths);
+        const totalH = heights.reduce((a,b)=>a+b,0);
+
+        // limit sanity: avoid insane huge pages (prevent browser crash)
+        const MAX_PIXELS = 20000 * 20000; // extremely large guard
+        if(maxW * totalH > MAX_PIXELS){
+          if(!confirm('صفحهٔ نهایی بسیار بزرگ خواهد شد و ممکن است مرورگر کرش کند. ادامه می‌دهی؟')){
+            createBtn.disabled = false; createBtn.textContent = 'ایجاد PDF'; return;
+          }
+        }
+
+        // create PDF
+        const { PDFDocument } = PDFLib;
+        const pdfDoc = await PDFDocument.create();
+
+        // create a single page with width=maxW and height=totalH (pdf-lib units are points but will work)
+        const page = pdfDoc.addPage([maxW, totalH]);
+
+        let yOffset = totalH; // we'll draw from top down (pdf-lib coordinates start at bottom)
+
+for(const item of imgs){
+          const { file, img } = item;
+          // read file bytes
+          const arrayBuffer = await file.arrayBuffer();
+          // detect type and embed accordingly
+          let embeddedImage;
+          if(file.type === 'image/png'){
+            embeddedImage = await pdfDoc.embedPng(arrayBuffer);
+          } else {
+            // treat others as JPG if possible
+            try{ embeddedImage = await pdfDoc.embedJpg(arrayBuffer); }
+            catch(e){ embeddedImage = await pdfDoc.embedPng(arrayBuffer); }
+          }
+
+          const iw = img.naturalWidth;
+          const ih = img.naturalHeight;
+
+          yOffset -= ih; // move down by image height
+          page.drawImage(embeddedImage, {
+            x: 0,
+            y: yOffset,
+            width: iw,
+            height: ih
+          });
+        }
+        
+        //  توجه: کد مربوط به افزودن متن فارسی بزرگ (که باعث خطای WinAnsi می‌شد) حذف شده است. 
+        /* const bigText = document.getElementById('bigText').textContent;
+        const helveticaFont = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+        const fontSize = Math.min(72, Math.floor(maxW / 12));
+        const textWidth = helveticaFont.widthOfTextAtSize(bigText, fontSize);
+        const textX = Math.max(16, (maxW - textWidth) / 2);
+        const textY = Math.max(12, 12); // bottom padding
+        page.drawText(bigText, { x: textX, y: textY, size: fontSize, font: helveticaFont, color: PDFLib.rgb(1,0.3,0.6) });
+        */
+
+        // finalize
+        const pdfBytes = await pdfDoc.save();
+
+        // filename handling
+        let name = (filenameInput.value || 'output').trim();
+        if(!name) name = 'output';
+        if(!name.toLowerCase().endsWith('.pdf')) name = name + '.pdf';
+
+        const blob = new Blob([pdfBytes], {type:'application/pdf'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+
+      }catch(err){
+        console.error(err); alert('در فرایند ساخت خطایی رخ داد: '+(err.message||err));
+      }finally{
+        createBtn.disabled = false; createBtn.textContent = 'ایجاد PDF';
+      }
+    });
+
+    // --- small entrance animation using GSAP ---
+    gsap.from('.card', {duration:1.1, y:40, opacity:0, ease:'power3.out'});
+    gsap.to('#bigText', {duration:2, repeat:-1, yoyo:true, textShadow:'0px 0px 30px rgba(255,77,136,0.9)'});
+  </script></body>
+</html>
